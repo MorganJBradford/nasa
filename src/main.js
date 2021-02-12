@@ -2,11 +2,19 @@ import $ from 'jquery';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import NasaService from './nasa.js';
+import PokeService from './pokemon-service.js';
 import './styles.css';
 
 function getPotd(response) {
   if (response.copyright) {
     $('#potd').append(`<img src="${response.hdurl}" class="picture">`);
+  }
+}
+
+function getSprite(response) {
+  console.log(response);
+  if (response.abilities){
+    $('#pokemon').append(`<img src="${response.sprites.front_default}" class="picture">`);
   }
 }
 
@@ -16,7 +24,6 @@ function clearPage() {
 }
 
 function getRoverPotd(response) {
-  console.log(response);
   if (response.photos.length===0) { // []
     return new Error("empty photo array");
   } else if (response.photos) { // []
@@ -30,13 +37,20 @@ async function apiCallPotd() {
   getPotd(response);
 }
 
+async function apiCallPokemon() {
+  const response = await PokeService.pokePic();
+  getSprite(response);
+}
+
 $(document).ready(function() {
   $('#potd-button').click(function() {
     clearPage();
     apiCallPotd();
+    apiCallPokemon();
   });
   $('#button').click(function() {
     clearPage();
+    apiCallPokemon();
     const camera = $("#camera").val();
 
     let val = NasaService.getRoverPhoto(camera)
